@@ -34,7 +34,7 @@ module "akv_example" {
   location            = var.location
   sku_name    = "premium"
   tenant_id           = var.tenant_id
-  access_policy       = [
+  access_policies       = [
     {
       tenant_id               = var.tenant_id
       object_id               = var.object_id

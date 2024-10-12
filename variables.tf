@@ -20,7 +20,7 @@ variable "tenant_id" {
   type        = string
 }
 
-variable "access_policy" {
+variable "access_policies" {
   description = "A list of access_policy objects (up to 1024) describing access policies."
   type = list(object({
     tenant_id               = string

@@ -13,14 +13,17 @@ resource "azurerm_key_vault" "key_vault" {
   public_network_access_enabled   = var.public_network_access_enabled
   soft_delete_retention_days      = var.soft_delete_retention_days
 
-  access_policy {
-    tenant_id               = var.access_policy.tenant_id
-    object_id               = var.access_policy.object_id
-    application_id          = var.access_policy.application_id
-    certificate_permissions = var.access_policy.certificate_permissions
-    key_permissions         = var.access_policy.key_permissions
-    secret_permissions      = var.access_policy.secret_permissions
-    storage_permissions     = var.access_policy.storage_permissions
+  dynamic access_policy {
+    for_each = var.access_policies != null ? [var.access_policies] : []
+    content {
+      tenant_id = access_policy.value.tenant_id
+      object_id = access_policy.value.object_id
+      application_id = access_policy.value.application_id
+      certificate_permissions = access_policy.value.certificate_permissions
+      key_permissions = access_policy.value.key_permissions
+      secret_permissions = access_policy.value.secret_permissions
+      storage_permissions = access_policy.value.storage_permissions
+    }
   }
 
   dynamic "network_acls" {
