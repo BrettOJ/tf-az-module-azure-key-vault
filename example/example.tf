@@ -1,7 +1,7 @@
 locals {
   tags = {
     "created-by" = "Terraform"
- 
+
   }
 
   naming_convention_info = {
@@ -13,6 +13,7 @@ locals {
     tier         = "web"
   }
 }
+data "azurerm_client_config" "current" {}
 
 module "resource_groups" {
   source = "git::https://github.com/BrettOJ/tf-az-module-resource-group?ref=main"
@@ -21,47 +22,36 @@ module "resource_groups" {
       name                   = var.resource_group_name
       location               = var.location
       naming_convention_info = local.naming_convention_info
-      tags = {
-
-      }
+      tags = local.tags
     }
   }
 }
 
+module "azurerm_user_assigned_identity" {
+  source                 = "git::https://github.com/BrettOJ/tf-az-module-auth-user-msi?ref=main"
+  resource_group_name    = module.resource_groups.rg_output[1].name
+  location               = var.location
+  naming_convention_info = local.naming_convention_info
+  tags                   = local.tags
+}
+
 module "akv_example" {
-  source              = "../" 
+  source              = "../"
   resource_group_name = module.resource_groups.rg_output[1].name
   location            = var.location
-  sku_name    = "premium"
-  tenant_id           = var.tenant_id
-  access_policies       = [
-    {
-      tenant_id               = var.tenant_id
-      object_id               = var.object_id
-      application_id          = var.application_id
-      certificate_permissions = ["get", "list"]
-      key_permissions         = ["get", "list"]
-      secret_permissions      = ["get", "list"]
-      storage_permissions     = ["get", "list"]
-    }
-  ]
+  sku_name            = "standard"
+  tenant_id           = data.azurerm_client_config.current.tenant_id
   enabled_for_deployment          = true
   enabled_for_disk_encryption     = true
   enabled_for_template_deployment = true
   enable_rbac_authorization       = true
+  network_acls = null
   purge_protection_enabled        = true
   public_network_access_enabled   = true
-  soft_delete_retention_days      = 7 
+  soft_delete_retention_days      = 7
 
 
-  network_acls = [
-    {
-      bypass         = "AzureServices"
-      default_action = "Allow"
-      ip_rules       = null
-      subnet_ids     = null
-    }
-  ]
+
   naming_convention_info = local.naming_convention_info
   tags                   = local.tags
 }

@@ -20,20 +20,6 @@ variable "tenant_id" {
   type        = string
 }
 
-variable "access_policies" {
-  description = "A list of access_policy objects (up to 1024) describing access policies."
-  type = list(object({
-    tenant_id               = string
-    object_id               = string
-    application_id          = string
-    certificate_permissions = list(string)
-    key_permissions         = list(string)
-    secret_permissions      = list(string)
-    storage_permissions     = list(string)
-  }))
-  default = []
-}
-
 variable "enabled_for_deployment" {
   description = "Boolean flag to specify whether Azure Virtual Machines are permitted to retrieve certificates stored as secrets from the key vault."
   type        = bool
@@ -66,6 +52,7 @@ variable "network_acls" {
     ip_rules                   = list(string)
     virtual_network_subnet_ids = list(string)
   })
+  default = null
 }
 
 variable "purge_protection_enabled" {
@@ -98,14 +85,5 @@ variable "naming_convention_info" {
 
 }
 
-variable "contact" {
-  description = "One or more contact block as defined below."
-  type = list(object({
-    email = string
-    name  = string
-    phone = string
-  }))
-  default = []
-}
 
 
