@@ -35,8 +35,8 @@ module "azurerm_user_assigned_identity" {
   tags                   = local.tags
 }
 
-module "akv_example" {
-  source              = "../"
+module "azurerm_key_vault" {
+  source = "../"
   resource_group_name = module.resource_groups.rg_output[1].name
   location            = var.location
   sku_name            = "standard"
@@ -45,13 +45,15 @@ module "akv_example" {
   enabled_for_disk_encryption     = true
   enabled_for_template_deployment = true
   enable_rbac_authorization       = true
-  network_acls = null
+  network_acls = {
+      bypass                     = "AzureServices"
+      default_action             = "Allow"
+      ip_rules                   = null
+      virtual_network_subnet_ids = null
+  }
   purge_protection_enabled        = true
   public_network_access_enabled   = true
   soft_delete_retention_days      = 7
-
-
-
-  naming_convention_info = local.naming_convention_info
   tags                   = local.tags
+  naming_convention_info = local.naming_convention_info
 }
